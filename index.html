@@ -408,7 +408,7 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
 </div>
 <div class="toast" id="toast"></div>
 
-<script>var APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxOy41mCXdxVwiPw0SU0P7dqL48xF5xBIivUNc07dAMbpmRuiu6Tn-4yOK-zt7LhhmZFg/exec";
+<script>var APPS_URL = "https://script.google.com/macros/s/AKfycbxOy41mCXdxVwiPw0SU0P7dqL48xF5xBIivUNc07dAMbpmRuiu6Tn-4yOK-zt7LhhmZFg/exec";
 
 var SUJETS     = [["🪖", "Casque de sécurité", "Art. 2.10.3 CSTC", "OBLIGATOIRE en tout temps sur le chantier, pauses et repas inclus. Aucune exception. Casque endommagé = remplacement immédiat."], ["🥾", "Bottes de sécurité CSA", "Art. 2.10.6 CSTC", "OBLIGATOIRES en tout temps, lacées et en bon état. Bottes usées ou sans protection adéquate refusées sur le chantier."], ["🦺", "Dossard haute visibilité", "Art. 10.4.1 CSTC", "OBLIGATOIRE en tout temps à l'extérieur et partout où un véhicule ou de la machinerie circule. Soyez visible en tout temps."], ["🥽", "Lunettes / protection oculaire", "Art. 2.10.5 CSTC", "Obligatoires si risque de projection ou de particules. Écran facial complet requis avec métal en fusion ou produits chimiques."], ["🔇", "Protections auditives", "Art. 2.10.7.6 CSTC", "Obligatoires dans toutes les zones bruyantes. L'employeur doit les fournir. La surdité professionnelle est irréversible — portez-les."], ["🏗", "Nacelle — ciseau lift ou girafe", "Art. 2.15.2 CSTC", "Harnais obligatoire à bord en tout temps, deux pieds au fond du panier. INTERDIT de monter sur le garde-corps ou de sortir de la nacelle en hauteur. Inspection quotidienne obligatoire chaque matin avant le début des travaux. Toute anomalie doit être signalée immédiatement au contremaître — ne pas utiliser l'équipement tant que non corrigée."], ["⚠️", "Signaux de danger et travaux superposés", "Art. 3.2.5 CSTC", "Travaux superposés INTERDITS. Tout travail en hauteur susceptible de faire tomber des objets sur des travailleurs doit être délimité par un périmètre de sécurité — banderoles rouges, filets ou barrières — pour éviter que ça arrive. Une fois les travaux terminés, retirez vos banderoles et libérez la zone."], ["🚛", "Manoeuvre de recul", "", "AUCUNE manoeuvre de recul sans signaleur désigné — tolérance zéro. Informez les livreurs dès leur arrivée. Toute violation doit être signalée au CoSS."], ["🪜", "Escabeau", "Art. 3.5 CSTC", "Déployez complètement sur les 4 pieds, verrous verrouillés. Dernière marche interdite. Ne pas utiliser comme échelle droite. Surface stable et nivelée obligatoire."], ["🧯", "Extincteur / Travaux à chaud", "Art. 3.4.3 CSTC", "Extincteur ABC obligatoire lors de tout travail à flammes nues ou étincelles. Permis de travail à chaud requis auprès du CoSS avant de débuter."], ["⚡", "Rallonges électriques", "Art. 2.11.3 CSTC", "Suspendues à 8 pieds (2,4 m) de hauteur ou protégées si au sol. Débranchées et rangées si inutilisées. Jamais de rallonge endommagée. Toute boîte électrique temporaire doit être munie d'un GFI (disjoncteur différentiel — protection contre les surcharges). Toute boîte électrique temporaire doit être suspendue dans les airs — jamais au sol."], ["🧹", "Ordre et propreté", "Art. 3.2.2 CSTC", "RAMASSEZ VOTRE ZONE AVANT CHAQUE FIN DE JOURNÉE. Rebuts et matériaux inutilisés évacués en continu. Un chantier propre prévient les chutes et les incendies."], ["🤝", "Harcèlement et violence", "", "Aucune violence physique ou verbale, harcèlement ou insubordination tolérés. Comportement irrespectueux = mesures disciplinaires immédiates pouvant aller jusqu'à l'expulsion."], ["📷", "Photos SST", "", "Le CoSS est autorisé à photographier toute non-conformité à des fins de documentation SST."], ["🚽", "Toilettes", "Art. 3.2.7 CSTC", "Les toilettes portatives sont là pour vous — utilisez-les. Il est strictement interdit de faire ses besoins ailleurs sur le chantier. C'est une question de respect et d'hygiène pour tous."], ["🚫", "Radio et écouteurs", "", "INTERDIT en tout temps sur le chantier — radio portative et écouteurs. Aucune exception. Vous devez entendre les alarmes, les avertisseurs et vos collègues en tout temps."], ["🚬", "Zone fumeurs", "", "Fumer et vapoter uniquement dans la zone désignée par l'employeur. Interdit à moins de 9 m du bâtiment et de tout matériau inflammable."]];
 var TIMERS_S   = [6, 7, 8, 7, 6, 13, 13, 8, 8, 9, 8, 9, 7, 3, 3, 3, 3];
@@ -816,6 +816,30 @@ document.addEventListener("DOMContentLoaded",function(){
   initSujets();
   initTol();
 });
+
+function envoyerVersSheet(params, onSuccess) {
+  // Construire l'URL avec paramètres
+  var url = APPS_URL + "?" + Object.keys(params).map(function(k){
+    return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]||"");
+  }).join("&");
+
+  // Utiliser une image pixel pour déclencher la requête GET sans CORS
+  var img = new Image();
+  img.onload = img.onerror = function() {
+    if(onSuccess) onSuccess();
+  };
+  img.src = url;
+
+  // Aussi essayer avec fetch
+  try {
+    fetch(url, {method:"GET", mode:"no-cors"}).catch(function(){});
+  } catch(e) {}
+
+  // Succès après 2 sec peu importe
+  setTimeout(function(){
+    if(onSuccess) onSuccess();
+  }, 2000);
+}
 </script>
 </body>
 </html>
