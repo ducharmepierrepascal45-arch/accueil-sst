@@ -805,27 +805,31 @@ document.addEventListener("DOMContentLoaded",function(){
 });
 
 function envoyerVersSheet(params, onSuccess) {
-  // Construire l'URL avec paramètres
   var url = APPS_URL + "?" + Object.keys(params).map(function(k){
     return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]||"");
   }).join("&");
 
-  // Utiliser une image pixel pour déclencher la requête GET sans CORS
-  var img = new Image();
-  img.onload = img.onerror = function() {
+  var done = false;
+  function succes() {
+    if(done) return;
+    done = true;
     if(onSuccess) onSuccess();
-  };
-  img.src = url;
+  }
 
-  // Aussi essayer avec fetch
+  // Une seule requête GET via fetch (no-cors)
   try {
-    fetch(url, {method:"GET", mode:"no-cors"}).catch(function(){});
-  } catch(e) {}
+    fetch(url, {method:"GET", mode:"no-cors"})
+      .then(function(){ succes(); })
+      .catch(function(){ succes(); });
+  } catch(e) {
+    // Fallback image pixel si fetch non disponible
+    var img = new Image();
+    img.onload = img.onerror = function(){ succes(); };
+    img.src = url;
+  }
 
-  // Succès après 2 sec peu importe
-  setTimeout(function(){
-    if(onSuccess) onSuccess();
-  }, 2000);
+  // Succès garanti après 3 sec (no-cors ne retourne pas toujours de réponse)
+  setTimeout(succes, 3000);
 }
 </script>
 </body>
