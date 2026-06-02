@@ -809,27 +809,13 @@ function envoyerVersSheet(params, onSuccess) {
     return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]||"");
   }).join("&");
 
-  var done = false;
-  function succes() {
-    if(done) return;
-    done = true;
-    if(onSuccess) onSuccess();
-  }
+  // Image pixel — une seule requête, pas de problème de redirection
+  var img = new Image();
+  img.onload = img.onerror = function(){};
+  img.src = url;
 
-  // Une seule requête GET via fetch (no-cors)
-  try {
-    fetch(url, {method:"GET", mode:"no-cors"})
-      .then(function(){ succes(); })
-      .catch(function(){ succes(); });
-  } catch(e) {
-    // Fallback image pixel si fetch non disponible
-    var img = new Image();
-    img.onload = img.onerror = function(){ succes(); };
-    img.src = url;
-  }
-
-  // Succès garanti après 3 sec (no-cors ne retourne pas toujours de réponse)
-  setTimeout(succes, 3000);
+  // Callback après 2.5 sec (no-cors ne retourne jamais de réponse exploitable)
+  setTimeout(function(){ if(onSuccess) onSuccess(); }, 2500);
 }
 </script>
 </body>
