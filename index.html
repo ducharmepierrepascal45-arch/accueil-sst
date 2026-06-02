@@ -131,13 +131,19 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
   <div class="card">
     <div class="card-hdr hg">👤 Informations du travailleur</div>
     <div class="card-body">
-      <!-- No d'accueil -->
-      <div class="field" style="margin-bottom:14px;">
-        <label style="font-size:11px;font-weight:700;color:var(--rouge);text-transform:uppercase;letter-spacing:1px;">
-          No d'accueil — attribué par le CoSS
-        </label>
-        <input type="text" id="f_no_accueil" placeholder="Ex: 2026-001"
-          style="font-size:18px;font-weight:800;letter-spacing:2px;text-align:center;border:2px solid var(--rouge);border-radius:6px;padding:12px;background:#fff5f4;">
+      <!-- No d'accueil — encadré bien visible -->
+      <div style="border:3px solid var(--rouge);border-radius:8px;margin-bottom:16px;overflow:hidden;">
+        <div style="background:var(--rouge);color:#fff;padding:8px 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-align:center;">
+          ⬇ Numéro d'accueil
+        </div>
+        <div style="padding:12px;background:#fff5f4;">
+          <input type="text" id="f_no_accueil" placeholder="Ex : 2026-001"
+            style="width:100%;font-size:24px;font-weight:800;letter-spacing:3px;text-align:center;border:2px solid var(--rouge);border-radius:6px;padding:14px;background:#fff;color:var(--rouge);">
+          <p style="font-size:11px;color:#8B0000;margin-top:8px;line-height:1.5;text-align:center;">
+            <strong>Attribué par le coordonnateur SST.</strong><br>
+            Si vous n'êtes pas au chantier, laissez ce champ vide — le numéro vous sera attribué plus tard par le CoSS.
+          </p>
+        </div>
       </div>
       <div class="fg2">
         <div class="field"><label>Prénom</label><input type="text" id="f_prenom" placeholder="Prénom" autocomplete="given-name"></div>
@@ -752,10 +758,10 @@ function soumettre() {
 
   var btn = document.getElementById("btn-sub");
   btn.disabled = true;
-  btn.textContent = "Envoi en cours...";
+  btn.textContent = "⏳ Envoi en cours...";
 
   var payload = {
-    _subject: "[Accueil #" + no_acc + "] " + prenom + " " + nom + " - " + entr + " - " + date,
+    type: "accueil",
     noAccueil: no_acc,
     prenom: prenom,
     nom: nom,
@@ -776,35 +782,16 @@ function soumettre() {
     consentementLSSTArt49: "Oui - signe electroniquement",
     signatureConsequences: sig_cons,
     photosJointes: photos.length,
-    photos_base64: photos,
-    cossInitiales: coss,
-    details: corps
+    cossInitiales: coss
   };
 
-  // Envoyer vers Apps Script (Google Sheets) - no-cors
-  try {
-    fetch("https://script.google.com/macros/s/AKfycbxOy41mCXdxVwiPw0SU0P7dqL48xF5xBIivUNc07dAMbpmRuiu6Tn-4yOK-zt7LhhmZFg/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-  } catch(e) { console.log("Apps Script:", e); }
-
-  // Envoyer vers Formspree (courriel)
-  fetch(APPS_SCRIPT, {
-    method: "POST",
-    mode: "no-cors",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  }).then(function() {
-    if(btn) { btn.disabled=false; btn.textContent="Soumettre"; }
+  // Envoi vers Google Sheets via GET (contourne le CORS)
+  envoyerVersSheet(payload, function() {
+    btn.disabled = false;
+    btn.textContent = "✅ Accueil envoyé avec succès!";
     document.getElementById("alertOk").classList.add("show");
     window.scrollTo(0,0);
-  }).catch(function() {
-    if(btn) { btn.disabled=false; btn.textContent="Soumettre"; }
-    document.getElementById("alertOk").classList.add("show");
-    window.scrollTo(0,0);
+    setTimeout(function(){ btn.textContent = "📤 Soumettre l'accueil"; }, 5000);
   });
 }
 
