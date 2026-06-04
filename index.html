@@ -151,7 +151,7 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
       </div>
       <div class="fg2">
         <div class="field"><label>Entreprise / Sous-traitant</label><input type="text" id="f_entr" placeholder="Nom de l'entreprise"></div>
-        <div class="field"><label>No carte CCQ</label><input type="text" id="f_ccq" placeholder="No CCQ" inputmode="numeric"></div>
+        <div class="field"><label>Statut CCQ</label><select id="f_ccq"><option value="">-- Choisissez --</option><option value="Apprenti 1">Apprenti 1</option><option value="Apprenti 2">Apprenti 2</option><option value="Apprenti 3">Apprenti 3</option><option value="Apprenti 4">Apprenti 4</option><option value="Compagnon">Compagnon</option><option value="Non assujetti">Non assujetti (hors CCQ)</option></select></div>
       </div>
       <div class="fg2">
         <div class="field"><label>Métier / Fonction</label><input type="text" id="f_metier" placeholder="Ex: Électricien"></div>
@@ -190,13 +190,7 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
   </div>
   <div class="card">
     <div class="card-hdr hb">📸 Photo de vos cartes / attestations</div>
-    <div class="photo-zone" onclick="document.getElementById('photo-input').click()">
-      <div style="font-size:28px;margin-bottom:6px;">📷</div>
-      <div style="font-size:13px;font-weight:700;color:var(--bleu);">Appuyez pour prendre une photo</div>
-      <div style="font-size:11px;color:var(--texte-l);margin-top:3px;">Cartes ASP, CCQ, attestations — max 5 photos</div>
-    </div>
-    <input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files);this.value=''">
-    <div class="photo-preview" id="photo-preview"></div>
+    <div class="photo-zone" onclick="document.getElementById('photo-input').click()"><div style="font-size:28px;margin-bottom:6px;">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--bleu);">Appuyez pour prendre une photo</div><div style="font-size:11px;color:var(--texte-l);margin-top:3px;">Carte CCQ, carte ASP, attestations — max 5 photos</div></div><input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files);this.value=''"><div class="photo-preview" id="photo-preview"></div>
   </div>
   <div class="nav-btns">
     <button class="btn-prev" onclick="goPage(0)">← Retour</button>
@@ -467,6 +461,14 @@ function nextPage(current) {
     }
     if(!bracelet) { showToast("Indiquez Oui ou Non pour le bracelet médical"); return; }
   }
+  if(current===1) {
+    var nbForm = Object.keys(formCheck).filter(function(k){return formCheck[k];}).length;
+    var autre = document.getElementById("formation_autre");
+    var aAutre = autre && autre.value.trim();
+    if(nbForm===0 && !aAutre && photos.length===0) {
+      showToast("Cochez au moins une formation OU ajoutez une photo de vos cartes"); return;
+    }
+  }
   if(current===2) {
     if(Object.keys(sujetOk).length<SUJETS.length) {
       showToast("Confirmez tous les sujets ("+Object.keys(sujetOk).length+"/"+SUJETS.length+")"); return;
@@ -529,11 +531,50 @@ function initFormations() {
 }
 
 // == PHOTOS ============================================
-function addPhotos(files) {
-  var rem=5-photos.length;
-  Array.from(files).slice(0,rem).forEach(function(f) {
-    var r=new FileReader(); r.onload=function(e){ photos.push(e.target.result); renderPhotos(); };
-    r.readAsDataURL(f);
+var photos = [];  // tableau de photos compressees base64
+
+function addPhotos(files){
+  var rem = 5 - photos.length;
+  Array.from(files).slice(0, rem).forEach(function(file){
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var img = new Image();
+      img.onload = function(){
+        var MAX=800, w=img.width, h=img.height;
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        if(h>600){w=Math.round(w*600/h);h=600;}
+        var cv=document.createElement("canvas");
+        cv.width=w; cv.height=h;
+        cv.getContext("2d").drawImage(img,0,0,w,h);
+        photos.push(cv.toDataURL("image/jpeg",0.75));
+        renderPhotos();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotos(){
+  var g=document.getElementById("photo-preview"); if(!g)return;
+  g.innerHTML="";
+  photos.forEach(function(src,i){
+    var d=document.createElement("div"); d.className="photo-thumb";
+    d.innerHTML="<img src='"+src+"' />";
+    var btn=document.createElement("button"); btn.className="photo-del"; btn.textContent="X";
+    btn.onclick=function(){ photos.splice(i,1); renderPhotos(); };
+    d.appendChild(btn); g.appendChild(d);
+  });
+  var z=document.querySelector(".photo-zone"); if(z) z.style.display=photos.length>=5?"none":"block";
+}
+
+function envoyerPhotos(noAcc, prenom, nom){
+  var APPS_P = APPS_URL;
+  photos.forEach(function(data, idx){
+    try{
+      fetch(APPS_P,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({type:"photo",noAccueil:noAcc||"",nom:(prenom+" "+nom).trim(),photoIndex:(idx+1),data:data})});
+    }catch(e){}
   });
 }
 function renderPhotos() {
@@ -791,6 +832,7 @@ function soumettre() {
     btn.textContent = "✅ Accueil envoyé avec succès!";
     document.getElementById("alertOk").classList.add("show");
     window.scrollTo(0,0);
+    envoyerPhotos(no_acc, prenom, nom);
     setTimeout(function(){ btn.textContent = "📤 Soumettre l'accueil"; }, 5000);
   });
 }
