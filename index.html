@@ -183,14 +183,14 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
 
 <!-- PAGE 1 : FORMATIONS -->
 <div class="page" id="page1">
-  <div class="notice"><div class="ni">📸</div><div>Cochez les formations que vous possédez, puis prenez une <strong>photo de vos cartes ou attestations</strong>.</div></div>
+  <div class="notice"><div class="ni">📸</div><div>Cochez les formations que vous possédez. La <strong>photo de votre carte CCQ est obligatoire</strong> (ajoutez aussi vos cartes ASP et attestations).</div></div>
   <div class="card">
     <div class="card-hdr hv">🎓 Formations et cartes de compétences</div>
     <div class="form-grid" id="form-grid"></div>
   </div>
   <div class="card">
     <div class="card-hdr hb">📸 Photo de vos cartes / attestations</div>
-    <div class="photo-zone" onclick="document.getElementById('photo-input').click()"><div style="font-size:28px;margin-bottom:6px;">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--bleu);">Appuyez pour prendre une photo</div><div style="font-size:11px;color:var(--texte-l);margin-top:3px;">Carte CCQ, carte ASP, attestations — max 5 photos</div></div><input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files);this.value=''"><div class="photo-preview" id="photo-preview"></div>
+    <div class="photo-zone" onclick="document.getElementById('photo-input').click()"><div style="font-size:28px;margin-bottom:6px;">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--bleu);">Appuyez pour prendre une photo</div><div style="font-size:11px;color:var(--texte-l);margin-top:3px;">OBLIGATOIRE — Carte CCQ minimum, + cartes ASP et attestations (max 5)</div></div><input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files);this.value=''"><div class="photo-preview" id="photo-preview"></div>
   </div>
   <div class="nav-btns">
     <button class="btn-prev" onclick="goPage(0)">← Retour</button>
@@ -462,11 +462,8 @@ function nextPage(current) {
     if(!bracelet) { showToast("Indiquez Oui ou Non pour le bracelet médical"); return; }
   }
   if(current===1) {
-    var nbForm = Object.keys(formCheck).filter(function(k){return formCheck[k];}).length;
-    var autre = document.getElementById("formation_autre");
-    var aAutre = autre && autre.value.trim();
-    if(nbForm===0 && !aAutre && photos.length===0) {
-      showToast("Cochez au moins une formation OU ajoutez une photo de vos cartes"); return;
+    if(photos.length===0) {
+      showToast("Photo obligatoire — prenez au moins une photo de votre carte CCQ"); return;
     }
   }
   if(current===2) {
