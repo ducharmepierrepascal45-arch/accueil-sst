@@ -100,6 +100,8 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
 .toast.show{display:block;}
 .sig-label{font-size:10px;font-weight:700;color:var(--bleu-d);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;margin-top:14px;}
 @media(max-width:400px){.fg2{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}}
+@keyframes flashRouge{0%,100%{background:#FFF0F0;}50%{background:#FFD6D6;}}
+.sujet-row .sujet-titre{}
 </style>
 </head>
 <body>
@@ -189,8 +191,8 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
     <div class="form-grid" id="form-grid"></div>
   </div>
   <div class="card">
-    <div class="card-hdr hb">📸 Photo de vos cartes / attestations</div>
-    <div class="photo-zone" onclick="document.getElementById('photo-input').click()"><div style="font-size:28px;margin-bottom:6px;">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--bleu);">Appuyez pour prendre une photo</div><div style="font-size:11px;color:var(--texte-l);margin-top:3px;">OBLIGATOIRE — Carte CCQ minimum, + cartes ASP et attestations (max 5)</div></div><input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files);this.value=''"><div class="photo-preview" id="photo-preview"></div>
+    <div class="card-hdr" style="background:var(--rouge);padding:9px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#fff;display:flex;align-items:center;gap:8px;">⛔ OBLIGATOIRE — Photo de votre carte CCQ et attestations</div>
+    <div class="photo-zone" onclick="document.getElementById('photo-input').click()" style="border:3px solid var(--rouge);background:#FDF0EF;"><div style="font-size:32px;margin-bottom:6px;">📷</div><div style="font-size:14px;font-weight:800;color:var(--rouge);">TOUCHEZ ICI — Prendre la photo</div><div style="font-size:12px;color:#8B0000;margin-top:5px;font-weight:700;">⛔ OBLIGATOIRE : Carte CCQ + cartes de formation (ASP, etc.)</div><div style="font-size:11px;color:#555;margin-top:3px;">Max 5 photos — pris avec votre caméra</div></div><input type="file" id="photo-input" accept="image/*" multiple capture="environment" style="display:none" onchange="addPhotos(this.files);this.value=''"><div class="photo-preview" id="photo-preview"></div>
   </div>
   <div class="nav-btns">
     <button class="btn-prev" onclick="goPage(0)">← Retour</button>
@@ -223,7 +225,9 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
           <div style="font-size:10px;font-weight:700;color:var(--rouge);text-transform:uppercase;margin-top:3px;">Hôpital le plus proche</div>
           <div style="font-size:13px;font-weight:700;color:var(--texte);margin-top:4px;">Hôpital de Joliette</div>
           <div style="font-size:11px;color:var(--texte-l);">705 boul. Curé-Majeau<br>Joliette (Québec)</div>
+          <div style="font-size:11px;font-weight:700;color:var(--rouge);margin-top:4px;">🚗 ~17 min du chantier (route 131 Nord)</div>
           <a href="tel:4507533511" style="display:block;margin-top:6px;background:var(--rouge);color:#fff;border-radius:6px;padding:5px;font-size:12px;font-weight:700;text-decoration:none;">📞 450 753-3511</a>
+          <a href="https://www.google.com/maps/dir/?api=1&origin=28+Rang+St-Fran%C3%A7ois,+Lavaltrie,+QC&destination=H%C3%B4pital+de+Joliette,+705+Boulevard+Cur%C3%A9-Majeau,+Joliette,+QC&travelmode=driving" target="_blank" style="display:block;margin-top:5px;background:var(--bleu);color:#fff;border-radius:6px;padding:5px;font-size:12px;font-weight:700;text-decoration:none;">🗺️ Ouvrir l'itinéraire GPS</a>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="background:#fff8e0;border:1.5px solid var(--orange);border-radius:8px;padding:8px;text-align:center;">
@@ -410,7 +414,7 @@ canvas.sig{border:2px solid var(--gris-brd);border-radius:8px;width:100%;backgro
 
 <script>var APPS_URL = "https://script.google.com/macros/s/AKfycbytuCPaOLcBrw_zj78FUZLw7ExbWNnBWODkkKY8knpmPFZiWeIAKDOk_oICn9GHfw3adg/exec";
 
-var SUJETS     = [["🪖", "Casque de sécurité", "Art. 2.10.3 CSTC", "OBLIGATOIRE en tout temps sur le chantier, pauses et repas inclus. Aucune exception. Casque endommagé = remplacement immédiat."], ["🥾", "Bottes de sécurité CSA", "Art. 2.10.6 CSTC", "OBLIGATOIRES en tout temps, lacées et en bon état. Bottes usées ou sans protection adéquate refusées sur le chantier."], ["🦺", "Dossard haute visibilité", "Art. 10.4.1 CSTC", "OBLIGATOIRE en tout temps à l'extérieur et partout où un véhicule ou de la machinerie circule. Soyez visible en tout temps."], ["🥽", "Lunettes / protection oculaire", "Art. 2.10.5 CSTC", "Obligatoires si risque de projection ou de particules. Écran facial complet requis avec métal en fusion ou produits chimiques."], ["🔇", "Protections auditives", "Art. 2.10.7.6 CSTC", "Obligatoires dans toutes les zones bruyantes. L'employeur doit les fournir. La surdité professionnelle est irréversible — portez-les."], ["🏗", "Nacelle — ciseau lift ou girafe", "Art. 2.15.2 CSTC", "Harnais obligatoire à bord en tout temps, deux pieds au fond du panier. INTERDIT de monter sur le garde-corps ou de sortir de la nacelle en hauteur. Inspection quotidienne obligatoire chaque matin avant le début des travaux. Toute anomalie doit être signalée immédiatement au contremaître — ne pas utiliser l'équipement tant que non corrigée."], ["⚠️", "Signaux de danger et travaux superposés", "Art. 3.2.5 CSTC", "Travaux superposés INTERDITS. Tout travail en hauteur susceptible de faire tomber des objets sur des travailleurs doit être délimité par un périmètre de sécurité — banderoles rouges, filets ou barrières — pour éviter que ça arrive. Une fois les travaux terminés, retirez vos banderoles et libérez la zone."], ["🚛", "Manoeuvre de recul", "", "AUCUNE manoeuvre de recul sans signaleur désigné — tolérance zéro. Informez les livreurs dès leur arrivée. Toute violation doit être signalée au CoSS."], ["🪜", "Escabeau", "Art. 3.5 CSTC", "Déployez complètement sur les 4 pieds, verrous verrouillés. Dernière marche interdite. Ne pas utiliser comme échelle droite. Surface stable et nivelée obligatoire."], ["🧯", "Extincteur / Travaux à chaud", "Art. 3.4.3 CSTC", "Extincteur ABC obligatoire lors de tout travail à flammes nues ou étincelles. Permis de travail à chaud requis auprès du CoSS avant de débuter."], ["⚡", "Rallonges électriques", "Art. 2.11.3 CSTC", "Suspendues à 8 pieds (2,4 m) de hauteur ou protégées si au sol. Débranchées et rangées si inutilisées. Jamais de rallonge endommagée. Toute boîte électrique temporaire doit être munie d'un GFI (disjoncteur différentiel — protection contre les surcharges). Toute boîte électrique temporaire doit être suspendue dans les airs — jamais au sol."], ["🧹", "Ordre et propreté", "Art. 3.2.2 CSTC", "RAMASSEZ VOTRE ZONE AVANT CHAQUE FIN DE JOURNÉE. Rebuts et matériaux inutilisés évacués en continu. Un chantier propre prévient les chutes et les incendies."], ["🤝", "Harcèlement et violence", "", "Aucune violence physique ou verbale, harcèlement ou insubordination tolérés. Comportement irrespectueux = mesures disciplinaires immédiates pouvant aller jusqu'à l'expulsion."], ["📷", "Photos SST", "", "Le CoSS est autorisé à photographier toute non-conformité à des fins de documentation SST."], ["🚽", "Toilettes", "Art. 3.2.7 CSTC", "Les toilettes portatives sont là pour vous — utilisez-les. Il est strictement interdit de faire ses besoins ailleurs sur le chantier. C'est une question de respect et d'hygiène pour tous."], ["🚫", "Radio et écouteurs", "", "INTERDIT en tout temps sur le chantier — radio portative et écouteurs. Aucune exception. Vous devez entendre les alarmes, les avertisseurs et vos collègues en tout temps."], ["🚬", "Zone fumeurs", "", "Fumer et vapoter uniquement dans la zone désignée par l'employeur. Interdit à moins de 9 m du bâtiment et de tout matériau inflammable."]];
+var SUJETS     = [["🪖", "Casque de sécurité", "Art. 2.10.3 CSTC", "OBLIGATOIRE en tout temps sur le chantier, pauses et repas inclus. Aucune exception. Casque endommagé = remplacement immédiat."], ["🥾", "Bottes de sécurité CSA", "Art. 2.10.6 CSTC", "OBLIGATOIRES en tout temps, lacées et en bon état. Bottes usées ou sans protection adéquate refusées sur le chantier."], ["🦺", "Dossard haute visibilité", "Art. 10.4.1 CSTC", "OBLIGATOIRE en tout temps à l'extérieur et partout où un véhicule ou de la machinerie circule. Soyez visible en tout temps."], ["🥽", "Lunettes / protection oculaire", "Art. 2.10.5 CSTC", "Obligatoires si risque de projection ou de particules. Écran facial complet requis avec métal en fusion ou produits chimiques."], ["🔇", "Protections auditives", "Art. 2.10.7.6 CSTC", "Obligatoires dans toutes les zones bruyantes. L'employeur doit les fournir. La surdité professionnelle est irréversible — portez-les."], ["🏗", "Nacelle — ciseau lift ou girafe", "Art. 2.15.2 CSTC", "Harnais obligatoire à bord en tout temps, deux pieds au fond du panier. INTERDIT de monter sur le garde-corps ou de sortir de la nacelle en hauteur. Inspection quotidienne obligatoire chaque matin avant le début des travaux. Toute anomalie doit être signalée immédiatement au contremaître — ne pas utiliser l'équipement tant que non corrigée."], ["⚠️", "Signaux de danger et travaux superposés", "Art. 3.2.5 CSTC", "Travaux superposés INTERDITS. Tout travail en hauteur susceptible de faire tomber des objets sur des travailleurs doit être délimité par un périmètre de sécurité — banderoles rouges, filets ou barrières — pour éviter que ça arrive. Une fois les travaux terminés, retirez vos banderoles et libérez la zone."], ["🚛", "Manoeuvre de recul", "", "AUCUNE manoeuvre de recul sans signaleur désigné — tolérance zéro. Informez les livreurs dès leur arrivée. Toute violation doit être signalée au CoSS."], ["🪜", "Escabeau", "Art. 3.5 CSTC", "Déployez complètement sur les 4 pieds, verrous verrouillés. Dernière marche interdite. Ne pas utiliser comme échelle droite. Surface stable et nivelée obligatoire."], ["🧯", "Extincteur / Travaux à chaud", "Art. 3.4.3 CSTC", "Extincteur ABC obligatoire lors de tout travail à flammes nues ou étincelles. Permis de travail à chaud requis auprès du CoSS avant de débuter."], ["⚡", "Rallonges électriques", "Art. 2.11.3 CSTC", "Suspendues à 8 pieds (2,4 m) de hauteur ou protégées si au sol. Débranchées et rangées si inutilisées. Jamais de rallonge endommagée. Toute boîte électrique temporaire doit être munie d'un GFI (disjoncteur différentiel — protection contre les surcharges). Toute boîte électrique temporaire doit être suspendue dans les airs — jamais au sol."], ["🧹", "Ordre et propreté", "Art. 3.2.2 CSTC", "RAMASSEZ VOTRE ZONE AVANT CHAQUE FIN DE JOURNÉE. Rebuts et matériaux inutilisés évacués en continu. Un chantier propre prévient les chutes et les incendies."], ["🤝", "Harcèlement et violence", "", "Aucune violence physique ou verbale, harcèlement ou insubordination tolérés. Comportement irrespectueux = mesures disciplinaires immédiates pouvant aller jusqu'à l'expulsion."], ["📷", "Photos SST", "", "Le CoSS est autorisé à photographier toute non-conformité à des fins de documentation SST."], ["🚽", "Toilettes", "Art. 3.2.7 CSTC", "Les toilettes portatives sont là pour vous — utilisez-les. Il est strictement interdit de faire ses besoins ailleurs sur le chantier. C'est une question de respect et d'hygiène pour tous."], ["🚫", "Radio et écouteurs", "", "INTERDIT en tout temps sur le chantier — radio portative et écouteurs. Aucune exception. Vous devez entendre les alarmes, les avertisseurs et vos collègues en tout temps."], ["🚬", "Zone fumeurs", "", "Fumer et vapoter uniquement dans la zone désignée par l'employeur. Interdit à moins de 9 m du bâtiment et de tout matériau inflammable."], ["🚨", "PASSAGE PIÉTONNIER ET ACCÈS AU CHANTIER", "Art. 2.4 CSTC / MTQ", "Tous les travailleurs doivent circuler UNIQUEMENT dans les passages piétonniers identifiés sur le chantier. Il est INTERDIT d'emprunter d'autres voies de circulation sans autorisation. Si un sous-traitant doit accéder au chantier en contrebas (accès à partir de l'autoroute) avec un véhicule, il doit en avertir le contremaître. Escorte routière obligatoire."]];
 var TIMERS_S   = [6, 7, 8, 7, 6, 13, 13, 8, 8, 9, 8, 9, 7, 3, 3, 3, 3];
 var FORMATIONS = ["ASP Construction", "Chute en hauteur", "Pistolet à scellement", "Silice cristalline", "SIMDUT 2015", "Échafaudages", "Nacelles / PEMP", "Cadenassage / LOTO", "Secouriste", "Élingues / levage", "Plateforme élévatrice", "Signaleur routier", "Espace clos", "Fit test (masque)", "Chariot élévateur", "Amiante"];
 var TOLERANCES = [["T0-1", "Chutes de hauteur — Protection antichute", "Ancrage TOUJOURS au-dessus de la tête du travailleur — la corde ne doit jamais être ancrée sous le travailleur. Longe maximale : 32 po (81 cm) pour réduire la distance de chute. La longe de 6 pieds est INTERDITE avec une corde d'assurance. L'enrouleur-dérouleur SRL-LE peut être positionné au sol ou en bas, mais doit être attaché DIRECTEMENT sur l'anneau dorsal en D — aucune cravate, aucune rallonge, aucun connecteur intermédiaire. Protection collective en priorité : garde-corps (42 po / 107 cm) ou filet de sécurité."], ["T0-2", "Chutes à partir d'une échelle", "Base stable, fixée au sommet, dépasse le palier de 3 pieds. 3 points d'appui en tout temps, corps entre les montants. Maximum 1h/jour sur échelle, fractionnable. Au-delà de 10 pieds : harnais + ancrage au-dessus de la tête obligatoires."], ["T0-3", "Zones dangereuses d'une machine", "Protecteurs en place, fonctionnels, non modifiés. Cadenassage / LOTO obligatoire avant tout entretien. Cadenas personnel pour chaque travailleur — aucune exception."], ["T0-4", "Effondrement d'un échafaudage", "Amarré solidement. Planchers complets — minimum 18½ pouces de largeur, fixés, sans espace. Garde-corps obligatoires si hauteur dépasse 10 pieds : lisse supérieure à 42 pouces, lisse intermédiaire à 21 pouces, plinthe de 6 pouces. Inspection avant chaque utilisation par une personne compétente."], ["T0-5", "Électrisation — Lignes électriques aérienne", "Distances minimales à respecter en tout temps : Moins de 125 kV → 10 pieds | De 125 kV à 250 kV → 16 pieds | De 250 kV à 550 kV → 26 pieds. Convention écrite Hydro-Québec obligatoire sur le chantier avant tout travail à proximité. Cadenassage obligatoire avant toute intervention électrique."], ["T0-6", "Effondrement des parois de creusement", "Étançonnement selon plans d'ingénieur ou roc sain. Matériaux et équipements : minimum 4 pieds des parois. Véhicules : minimum 10 pieds des parois. Échelle d'accès obligatoire tous les 50 pieds linéaires. Pompage si présence d'eau."], ["T0-7", "Exposition à l'amiante", "Vérifier la présence d'amiante avant tout travail susceptible d'en émettre. Enceinte étanche obligatoire. APR approprié + fit test. Registre de gestion requis."], ["T0-8", "Exposition à la silice", "Procédés humides ou captation à la source en priorité. Programme de protection respiratoire en place. APR approprié + fit test obligatoires pendant toutes les heures de travail."], ["T0-9", "Monoxyde de carbone", "Maximum 35 ppm sur 8 heures. Prioriser les outils électriques en intérieur. Détecteurs CO industriels près de toute source de combustion. Ventilation adéquate obligatoire en tout temps."], ["T0-10", "Roches instables", "Les parois et le plafond de toute excavation souterraine peuvent s'effondrer et tuer. Avant tout accès : vérifier et s'assurer que les parois et le plafond sont exempts de roches instables. Plans et devis d'un ingénieur requis avant de débuter toute excavation souterraine, mis à jour à mesure des travaux. Tout accès à une excavation délaissée doit être fermé et affiché ACCÈS INTERDIT."]];
@@ -596,6 +600,10 @@ function initSujets() {
     var icon=document.createElement("div"); icon.className="sujet-icon"; icon.textContent=s[0];
     var info=document.createElement("div"); info.className="sujet-info";
     info.innerHTML='<div class="sujet-titre">'+s[1]+'</div>'+(s[2]?'<div class="sujet-ref">'+s[2]+'</div>':'')+'<div class="sujet-desc">'+s[3]+'</div>';
+    // Couleur FLASH pour les sujets critiques de circulation
+    if(s[1].indexOf("PASSAGE")>=0 || s[1].indexOf("ACC\u00c8S")>=0) {
+      row.style.cssText += ";background:#FFF0F0;border:3px solid #FF0000;animation:flashRouge 1.2s infinite;border-radius:8px;";
+    }
     var btn=document.createElement("button"); btn.type="button"; btn.className="sujet-btn waiting"; btn.id="sb_"+i; btn.textContent="5s...";
     row.appendChild(bar); row.appendChild(icon); row.appendChild(info); row.appendChild(btn);
     el.appendChild(row);
@@ -608,24 +616,19 @@ function demarrerSujet(i) {
   var row=document.getElementById("sr_"+i), bar=document.getElementById("stb_"+i), btn=document.getElementById("sb_"+i);
   row.style.display="flex";
   setTimeout(function(){ row.scrollIntoView({behavior:"smooth",block:"center"}); },100);
-  var sec = TIMERS_S[i] || 5;
-  bar.style.transition="width "+sec+"s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
-  var iv=setInterval(function() {
-    sec--; btn.textContent=sec>0?sec+"s...":"Lu !";
-    if(sec<=0) {
-      clearInterval(iv); btn.className="sujet-btn"; btn.textContent="Confirmer";
-      btn.onclick=function(){ confirmerSujet(i); };
-    }
-  },1000);
+  // Bouton Confirmer disponible immédiatement (délai retiré)
+  bar.style.transition="width .4s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
+  btn.className="sujet-btn"; btn.textContent="Confirmer";
+  btn.onclick=function(){ confirmerSujet(i); };
 }
 
 function confirmerSujet(i) {
   sujetOk[i]=true;
-  var btn=document.getElementById("sb_"+i); if(btn){ btn.className="sujet-btn ok"; btn.textContent="Confirme"; btn.onclick=null; }
+  var btn=document.getElementById("sb_"+i); if(btn){ btn.className="sujet-btn ok"; btn.textContent="Confirmé"; btn.onclick=null; }
   var cnt=Object.keys(sujetOk).length;
   document.getElementById("sujets-cpt").innerHTML="<strong>"+cnt+"</strong> / "+SUJETS.length+" sujets confirmés";
   if(cnt<SUJETS.length) setTimeout(function(){ demarrerSujet(i+1); },300);
-  else { document.getElementById("btn-next-sujets").disabled=false; document.getElementById("btn-next-sujets").textContent="Tous confirmes - Continuer"; }
+  else { document.getElementById("btn-next-sujets").disabled=false; document.getElementById("btn-next-sujets").textContent="Tous confirmés — Continuer"; }
 }
 
 // == TOLÉRANCES SÉQUENTIELLES 5 SEC ===================
@@ -650,15 +653,10 @@ function demarrerTol(i) {
   var div=document.getElementById("ti_"+i), bar=document.getElementById("ttb_"+i), btn=document.getElementById("tb_"+i);
   div.style.display="block";
   setTimeout(function(){ div.scrollIntoView({behavior:"smooth",block:"center"}); },100);
-  var sec = TIMERS_T[i] || 5;
-  bar.style.transition="width "+sec+"s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
-  var iv=setInterval(function() {
-    sec--; btn.textContent=sec>0?sec+"s...":"Lu !";
-    if(sec<=0) {
-      clearInterval(iv); btn.className="tol-btn"; btn.textContent="Confirmer";
-      btn.onclick=function(){ confirmerTol(i); };
-    }
-  },1000);
+  // Bouton disponible immédiatement (délai retiré)
+  bar.style.transition="width .4s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
+  btn.className="tol-btn"; btn.textContent="J'ai compris — Tolérance 0";
+  btn.onclick=function(){ confirmerTol(i); };
 }
 
 function confirmerTol(i) {
@@ -669,7 +667,7 @@ function confirmerTol(i) {
   if(cnt<TOLERANCES.length) setTimeout(function(){ demarrerTol(i+1); },300);
   else {
     document.getElementById("btn-next-tol").disabled=false;
-    document.getElementById("btn-next-tol").textContent="Toutes confirmees - Continuer";
+    document.getElementById("btn-next-tol").textContent="Toutes confirmées - Continuer";
     // Afficher la section consequences apres toutes les T0
     var cons = document.getElementById("consequences-block");
     if(cons) {
