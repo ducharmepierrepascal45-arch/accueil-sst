@@ -484,6 +484,12 @@ function nextPage(current) {
     if(Object.keys(tolOk).length<TOLERANCES.length) {
       showToast("Confirmez toutes les tolérances ("+Object.keys(tolOk).length+"/"+TOLERANCES.length+")"); return;
     }
+    if(!hasSig("sig_consequences","ctx_consequences")) {
+      showToast("Vous devez signer la politique disciplinaire avant de continuer");
+      var cons=document.getElementById("consequences-block");
+      if(cons){ cons.style.display="block"; setTimeout(function(){ cons.scrollIntoView({behavior:"smooth",block:"center"}); },100); }
+      return;
+    }
   }
   goPage(current+1);
 }
@@ -556,26 +562,32 @@ function addPhotos(files){
   });
 }
 
-function renderPhotos(){
-  var g=document.getElementById("photo-preview"); if(!g)return;
-  g.innerHTML="";
-  photos.forEach(function(src,i){
-    var d=document.createElement("div"); d.className="photo-thumb";
-    d.innerHTML="<img src='"+src+"' />";
-    var btn=document.createElement("button"); btn.className="photo-del"; btn.textContent="X";
-    btn.onclick=function(){ photos.splice(i,1); renderPhotos(); };
-    d.appendChild(btn); g.appendChild(d);
-  });
-  var z=document.querySelector(".photo-zone"); if(z) z.style.display=photos.length>=5?"none":"block";
-}
-
 function envoyerPhotos(noAcc, prenom, nom){
   var APPS_P = APPS_URL;
+  var nomComplet = (prenom+" "+nom).trim();
+  // 1) Envoyer les photos de cartes
   photos.forEach(function(data, idx){
     try{
       fetch(APPS_P,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({type:"photo",noAccueil:noAcc||"",nom:(prenom+" "+nom).trim(),photoIndex:(idx+1),data:data})});
+        body:JSON.stringify({type:"photo",noAccueil:noAcc||"",nom:nomComplet,photoIndex:(idx+1),data:data})});
     }catch(e){}
+  });
+  // 2) Envoyer les 3 signatures comme images (libellées) — décalées pour ne pas saturer
+  var sigs = [
+    {key:"sig_trav",        label:"Signature-Art49"},
+    {key:"sig_consequences",label:"Signature-Politique"},
+    {key:"sig_consent",     label:"Signature-Consentement"}
+  ];
+  sigs.forEach(function(s, k){
+    if(!hasSig(s.key, "ctx_"+s.key.replace("sig_",""))) return;
+    var data = getSigData(s.key);
+    if(!data || data.length < 200) return;
+    setTimeout(function(){
+      try{
+        fetch(APPS_P,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({type:"photo",noAccueil:noAcc||"",nom:nomComplet,photoIndex:s.label,data:data})});
+      }catch(e){}
+    }, (photos.length + k) * 400);
   });
 }
 function renderPhotos() {
@@ -616,10 +628,19 @@ function demarrerSujet(i) {
   var row=document.getElementById("sr_"+i), bar=document.getElementById("stb_"+i), btn=document.getElementById("sb_"+i);
   row.style.display="flex";
   setTimeout(function(){ row.scrollIntoView({behavior:"smooth",block:"center"}); },100);
-  // Bouton Confirmer disponible immédiatement (délai retiré)
-  bar.style.transition="width .4s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
-  btn.className="sujet-btn"; btn.textContent="Confirmer";
-  btn.onclick=function(){ confirmerSujet(i); };
+  // Délai de 5 secondes avant que le bouton Confirmer s'active
+  var sec = 5;
+  btn.className="sujet-btn waiting"; btn.textContent=sec+"s..."; btn.onclick=null;
+  bar.style.transition="width "+sec+"s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
+  var iv=setInterval(function(){
+    sec--;
+    if(sec>0){ btn.textContent=sec+"s..."; }
+    else {
+      clearInterval(iv);
+      btn.className="sujet-btn"; btn.textContent="Confirmer";
+      btn.onclick=function(){ confirmerSujet(i); };
+    }
+  },1000);
 }
 
 function confirmerSujet(i) {
@@ -653,10 +674,19 @@ function demarrerTol(i) {
   var div=document.getElementById("ti_"+i), bar=document.getElementById("ttb_"+i), btn=document.getElementById("tb_"+i);
   div.style.display="block";
   setTimeout(function(){ div.scrollIntoView({behavior:"smooth",block:"center"}); },100);
-  // Bouton disponible immédiatement (délai retiré)
-  bar.style.transition="width .4s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
-  btn.className="tol-btn"; btn.textContent="J'ai compris — Tolérance 0";
-  btn.onclick=function(){ confirmerTol(i); };
+  // Délai de 3 secondes avant que le bouton s'active
+  var sec = 3;
+  btn.className="tol-btn waiting"; btn.textContent=sec+"s..."; btn.onclick=null;
+  bar.style.transition="width "+sec+"s linear"; setTimeout(function(){ bar.style.width="100%"; },50);
+  var iv=setInterval(function(){
+    sec--;
+    if(sec>0){ btn.textContent=sec+"s..."; }
+    else {
+      clearInterval(iv);
+      btn.className="tol-btn"; btn.textContent="J'ai compris — Tolérance 0";
+      btn.onclick=function(){ confirmerTol(i); };
+    }
+  },1000);
 }
 
 function confirmerTol(i) {
